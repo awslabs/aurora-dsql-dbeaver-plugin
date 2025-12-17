@@ -56,7 +56,7 @@ Features:
 - Place the myKeystore.jks in /tmp/
 
 1. Run ```mvn clean package  -Dkeystore.password=[JKS_PASSWORD]```
-2. The local repo is located in the folder ```com.aws.aurora.dsql.updatesite > target > repository``` 
+2. The local repo is located in the folder ```software.aws.aurora.dsql.dbeaver.updatesite > target > repository``` 
 3. Follow the installation instructions above and use the local repo location instead of the URL. 
 
 ## Security
