@@ -9,10 +9,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>com.aws.aurora.dsql</module>
-        <module>com.aws.aurora.dsql.ui</module>
-        <module>com.aws.aurora.dsql.feature</module>
-        <module>com.aws.aurora.dsql.updatesite</module>
+        <module>software.aws.aurora.dsql.dbeaver</module>
+        <module>software.aws.aurora.dsql.dbeaver.ui</module>
+        <module>software.aws.aurora.dsql.dbeaver.feature</module>
+        <module>software.aws.aurora.dsql.dbeaver.updatesite</module>
     </modules>
 
     <repositories>
