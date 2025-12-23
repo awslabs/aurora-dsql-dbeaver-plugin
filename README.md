@@ -50,15 +50,15 @@ Features:
 
 ### Missing Driver Error
 
-If you see a missing driver icon or connection errors, the Aurora DSQL (Community Plugin) may not be installed in your current DBeaver version.
+If you see a missing driver icon or connection errors, the Aurora DSQL (Community Plugin) may not be installed in your current DBeaver version. See below some examples of errors and how to fix them:
 
 * Creating a new connection with the missing driver: 
 
-   ![Missing Driver Icon](assets/missing_driver_icon.png)
+   ![Missing Driver Icon](https://github.com/awslabs/aurora-dsql-dbeaver-plugin/blob/main/assets/missing_driver_icon.png)
 
 * Attempting to connect without the driver: 
 
-   ![Error Dialog](assets/error_dialog.png)
+   ![Error Dialog](https://github.com/awslabs/aurora-dsql-dbeaver-plugin/blob/main/assets/error_dialog.png)
 
 **Cause:** When multiple DBeaver versions are installed, connection settings are shared but drivers are installed per application.
 
