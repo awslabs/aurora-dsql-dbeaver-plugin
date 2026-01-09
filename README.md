@@ -31,7 +31,7 @@ Then proceed with the installation steps below.
 3. Click **Add** to add a new repository
 4. Enter:
    - **Name**: `Aurora DSQL Plugin`
-   - **Location**: `https://awslabs.github.io/aurora-dsql-dbeaver-plugin/repository/`
+   - **Location**: `https://awslabs.github.io/aurora-dsql-dbeaver-plugin/update-site/`
 5. Check **Aurora DSQL Connector for JDBC**
 6. Click **Next**, accept the license, and complete the installation
 7. Restart DBeaver when prompted
