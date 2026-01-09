@@ -8,6 +8,6 @@
         <artifactId>parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>software.aws.aurora.dsql.dbeaver.feature</artifactId>
+    <artifactId>feature</artifactId>
     <packaging>eclipse-feature</packaging>
 </project>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="software.aws.aurora.dsql.dbeaver.feature"
+      id="feature"
       label="Aurora DSQL Connector for JDBC"
       version="1.0.0.qualifier"
       provider-name="AWS">
@@ -197,7 +197,7 @@
          version="1.0.0.qualifier"/>
 
    <plugin
-         id="software.aws.aurora.dsql.dbeaver.ui"
+         id="ui"
          version="1.0.0.qualifier"/>
 
 </feature>
