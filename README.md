@@ -1,5 +1,9 @@
 # Aurora DSQL Plugin for DBeaver
 
+[![GitHub](https://img.shields.io/badge/github-awslabs/aurora--dsql--dbeaver--plugin-blue?logo=github)](https://github.com/awslabs/aurora-dsql-dbeaver-plugin)
+[![License](https://img.shields.io/badge/license-Apache--2.0-brightgreen)](https://github.com/awslabs/aurora-dsql-dbeaver-plugin/blob/main/LICENSE)
+[![Discord chat](https://img.shields.io/discord/1435027294837276802.svg?logo=discord)](https://discord.com/invite/nEF6ksFWru)
+
 A DBeaver plugin that enables connectivity to Amazon Aurora DSQL databases with IAM authentication support.
 
 ## Overview
