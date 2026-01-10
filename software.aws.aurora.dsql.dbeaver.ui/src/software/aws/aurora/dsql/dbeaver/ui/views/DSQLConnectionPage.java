@@ -2,6 +2,8 @@ package software.aws.aurora.dsql.dbeaver.ui.views;
 
 import static org.jkiss.dbeaver.ext.postgresql.PostgreUtils.getServerType;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -37,8 +39,11 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
     private static final String CONN_PROPERTY_PROFILE = "profile";
     private static final String CONN_PROPERTY_REGION = "region";
 
-    private static final String DEFAULT_PORT = "5432";
-    private static final String DEFAULT_DATABASE = "postgres";
+    // Validation patterns
+    private static final Pattern AWS_REGION_PATTERN = Pattern.compile("^[a-z]{2,3}(-[a-z]+)?-[a-z]+-\\d+$");
+    private static final Pattern DSQL_ENDPOINT_PATTERN = Pattern.compile("^.+\\.dsql\\.[a-z]{2,3}(-[a-z]+)?-[a-z]+-\\d+\\.on\\.aws$");
+    
+    // Remove hard-coded defaults - prefer driver defaults
     private static final String DEFAULT_PROFILE = "default";
     private static final String DEFAULT_ENDPOINT_TEMPLATE = "{clusterid}.dsql.{region}.on.aws";
 
@@ -94,6 +99,7 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
         Label profileLabel = UIUtils.createControlLabel(myGroup, DSQLMessages.label_aws_profile);
         profileText = new Text(myGroup, SWT.BORDER);
         profileText.setMessage(DSQLMessages.place_holder_profile);
+        profileText.setToolTipText(DSQLMessages.help_profile);
         GridData profileGD = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
         profileGD.widthHint = 200;
         profileText.setLayoutData(profileGD);
@@ -102,6 +108,7 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
         Label regionLabel = UIUtils.createControlLabel(myGroup, DSQLMessages.label_aws_region);
         regionText = new Text(myGroup, SWT.BORDER);
         regionText.setMessage(DSQLMessages.place_holder_region);
+        regionText.setToolTipText(DSQLMessages.help_region);
         GridData regionGD = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
         regionGD.widthHint = 200;
         regionText.setLayoutData(regionGD);
@@ -149,18 +156,9 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
             @Override
             public void widgetSelected(SelectionEvent e) {
                 setupConnectionModeSelection(urlText, typeURLRadio.getSelection(), GROUP_CONNECTION_ARR);
-
-                boolean urlMode = typeURLRadio.getSelection();
-                if (userNameText != null) {
-                    userNameText.setEnabled(!urlMode);
-                }
-                if (profileText != null) {
-                    profileText.setEnabled(!urlMode);
-                }
-                if (regionText != null) {
-                    regionText.setEnabled(!urlMode);
-                }
-
+                
+                // Use centralized UI state management
+                setManualFieldsEnabled(!typeURLRadio.getSelection());
                 updateUrl();
             }
         };
@@ -180,6 +178,7 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
                 DSQLMessages.label_dsql_endpoint
         );
         hostText = new Text(addrGroup, SWT.BORDER);
+        hostText.setToolTipText(DSQLMessages.help_endpoint);
         gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.grabExcessHorizontalSpace = true;
         hostText.setLayoutData(gd);
@@ -195,11 +194,48 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
 
     @Override
     public boolean isComplete() {
+        // Clear any previous error messages
+        setErrorMessage(null);
+        
         if (isCustomURL()) {
-            return !CommonUtils.isEmpty(urlText.getText());
+            if (CommonUtils.isEmpty(urlText.getText())) {
+                setErrorMessage(DSQLMessages.error_endpoint_required);
+                return false;
+            }
+            return true;
         } else {
-            return !CommonUtils.isEmpty(hostText.getText())
-                    && !CommonUtils.isEmpty(userNameText.getText());
+            // Manual configuration validation
+            if (CommonUtils.isEmpty(hostText.getText())) {
+                setErrorMessage(DSQLMessages.error_endpoint_required);
+                return false;
+            }
+            
+            if (CommonUtils.isEmpty(userNameText.getText())) {
+                setErrorMessage(DSQLMessages.error_username_required);
+                return false;
+            }
+            
+            // Validate endpoint format
+            String endpoint = hostText.getText().trim();
+            if (!endpoint.equals(DEFAULT_ENDPOINT_TEMPLATE) && !isValidDSQLEndpoint(endpoint)) {
+                setErrorMessage(DSQLMessages.error_endpoint_invalid);
+                return false;
+            }
+            
+            // Validate region if provided
+            String region = regionText.getText().trim();
+            if (!CommonUtils.isEmpty(region) && !isValidAWSRegion(region)) {
+                setErrorMessage(DSQLMessages.error_region_invalid);
+                return false;
+            }
+            
+            // Require region for manual configuration (unless using template)
+            if (CommonUtils.isEmpty(region) && !endpoint.equals(DEFAULT_ENDPOINT_TEMPLATE)) {
+                setErrorMessage(DSQLMessages.error_region_required);
+                return false;
+            }
+            
+            return true;
         }
     }
 
@@ -226,25 +262,18 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
             }
         }
 
-        // Load values into a String. These fields are not required for DSQL.
-        // Default port is 5432, Default databaseName is postgres.
+        // Prefer driver defaults over hard-coded values
         if (!CommonUtils.isEmpty(connectionInfo.getHostPort())) {
             port = connectionInfo.getHostPort();
-        } else if (getSite().isNew()) {
-            port = CommonUtils.notEmpty(driver.getDefaultPort());
         } else {
-            port = DEFAULT_PORT;
+            port = CommonUtils.notEmpty(driver.getDefaultPort());
         }
 
         String databaseName = connectionInfo.getDatabaseName();
         if (CommonUtils.isEmpty(databaseName)) {
-            if (getSite().isNew()) {
-                databaseName = driver.getDefaultDatabase();
-                if (CommonUtils.isEmpty(databaseName)) {
-                    databaseName = PostgreConstants.DEFAULT_DATABASE;
-                }
-            } else {
-                databaseName = DEFAULT_DATABASE;
+            databaseName = driver.getDefaultDatabase();
+            if (CommonUtils.isEmpty(databaseName)) {
+                databaseName = PostgreConstants.DEFAULT_DATABASE;
             }
         }
         db = databaseName;
@@ -352,5 +381,38 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
             }
             urlText.setText(driver.getConnectionURL(config));
         }
+    }
+
+    /**
+     * Centralized UI state management for manual configuration fields
+     */
+    private void setManualFieldsEnabled(boolean enabled) {
+        if (userNameText != null) {
+            userNameText.setEnabled(enabled);
+        }
+        if (profileText != null) {
+            profileText.setEnabled(enabled);
+        }
+        if (regionText != null) {
+            regionText.setEnabled(enabled);
+        }
+    }
+
+    /**
+     * Validates AWS region format
+     * @param region AWS region string
+     * @return true if valid AWS region format
+     */
+    private boolean isValidAWSRegion(String region) {
+        return region != null && AWS_REGION_PATTERN.matcher(region.toLowerCase()).matches();
+    }
+
+    /**
+     * Validates DSQL endpoint format
+     * @param endpoint DSQL endpoint string
+     * @return true if valid DSQL endpoint format
+     */
+    private boolean isValidDSQLEndpoint(String endpoint) {
+        return endpoint != null && DSQL_ENDPOINT_PATTERN.matcher(endpoint.toLowerCase()).matches();
     }
 }
