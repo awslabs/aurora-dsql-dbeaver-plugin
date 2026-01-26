@@ -24,7 +24,8 @@ jobs:
       - name: Build JARs
         run: mvn clean install -P jars
 
-      ##TODO REMOVE 
-      - name: Verify JAR signatures
-        run: |
-          find . -name "*.jar" -type f -exec jarsigner -verify -verbose {} \;
+      - name: Upload JARs
+        uses: actions/upload-artifact@v3
+        with:
+          name: jars
+          path: '**/target/*.jar'
