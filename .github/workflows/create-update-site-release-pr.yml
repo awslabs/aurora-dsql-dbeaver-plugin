@@ -25,7 +25,7 @@ jobs:
         run: mvn clean install -P jars
 
       - name: Upload JARs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jars
           path: '**/target/*.jar'
