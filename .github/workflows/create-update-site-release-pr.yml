@@ -8,6 +8,10 @@ on:
     branches: [ main ]    # TODO REMOVE Runs when PR is opened/updated targeting main branch
   workflow_dispatch:      # Runs when you manually click "Run workflow" button
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
