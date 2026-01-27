@@ -103,9 +103,24 @@ jobs:
           S3_SIGNED_BUCKET: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_SIGNED_BUCKET }}
           S3_SIGNER_FOLDERS: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_SIGNER_FOLDERS }}
 
+      - name: Install signed JARs to Maven
+        run: |
+          cd signed
+          for SIGNED_JAR in *.jar; do
+            ORIGINAL_NAME=$(echo "$SIGNED_JAR" | sed 's/-[0-9a-f]\{8\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{4\}-[0-9a-f]\{12\}\.jar$//')
+            NAME_NO_EXT=$(echo "$ORIGINAL_NAME" | sed 's/\.jar$//')
+            ARTIFACT_ID=$(echo "$NAME_NO_EXT" | sed 's/-[0-9].*//')
+            VERSION=$(echo "$NAME_NO_EXT" | sed "s/^$ARTIFACT_ID-//")
+            echo "Installing: $SIGNED_JAR as $ARTIFACT_ID:$VERSION"
+            mvn install:install-file -Dfile="./$SIGNED_JAR" -DgroupId=software.aws.aurora.dsql.dbeaver -DartifactId="$ARTIFACT_ID" -Dversion="$VERSION" -Dpackaging=jar
+          done
+        shell: bash
 
-      - name: Upload JARs
+      - name: Build Update Site Repo
+        run: mvn clean install -P packaging
+
+      - name: Upload Update Site Repository
         uses: actions/upload-artifact@v4
         with:
-          name: jars
-          path: 'signed/*.jar'
+          name: update-site-repository
+          path: 'software.aws.aurora.dsql.dbeaver.updatesite/target/repository/**'
