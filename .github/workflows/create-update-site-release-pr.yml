@@ -119,8 +119,14 @@ jobs:
       - name: Build Update Site Repo
         run: mvn clean install -P packaging
 
+      - name: Copy to update-site directory
+        run: |
+          # Remove old files from update-site directory
+          rm -rf update-site/* 
+          # cp -r software.aws.aurora.dsql.dbeaver.updatesite/target/repository/* update-site/
+
       - name: Upload Update Site Repository
         uses: actions/upload-artifact@v4
         with:
           name: update-site-repository
-          path: 'software.aws.aurora.dsql.dbeaver.updatesite/target/repository/**'
+          path: 'update-site/**'
