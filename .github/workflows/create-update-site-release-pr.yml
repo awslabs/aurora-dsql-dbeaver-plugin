@@ -38,9 +38,12 @@ jobs:
         run: |
           find . -path "*/target/*.jar" -type f -exec bash -c '
             FILENAME=$(basename "$0")
-            aws s3 cp "$0" "s3://$S3_BUCKET/$S3_KEY_PREFIX/$FILENAME" > /dev/null 2>&1
-            VERSION_ID=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$S3_KEY_PREFIX/$FILENAME" --output json 2>/dev/null | jq -r ".VersionId")
-            echo "Uploaded: $FILENAME, VersionId: $VERSION_ID"
+            if aws s3 cp "$0" "s3://$S3_BUCKET/$S3_KEY_PREFIX/$FILENAME" --no-progress 2>&1 | grep -q "upload:"; then
+              VERSION_ID=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$S3_KEY_PREFIX/$FILENAME" --output json 2>/dev/null | jq -r ".VersionId")
+              echo "Uploaded: $FILENAME, VersionId: $VERSION_ID"
+            else
+              echo "Failed to upload: $FILENAME"
+            fi
           ' {} \;
         env:
           S3_BUCKET: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_BUCKET }}
