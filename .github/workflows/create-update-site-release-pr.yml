@@ -79,6 +79,17 @@ jobs:
           S3_SIGNER_FOLDERS: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_SIGNER_FOLDERS }}
 
      
+      - name: Wait for signed JARs to exist in S3
+        run: |
+          while read -r SIGNED_FILENAME; do
+            echo "Waiting for: $SIGNED_FILENAME"
+            aws s3api wait object-exists --bucket "$S3_SIGNED_BUCKET" --key "$S3_SIGNER_FOLDERS/$SIGNED_FILENAME"
+            echo "Confirmed: $SIGNED_FILENAME exists"
+          done < signed_jars.txt
+        env:
+          S3_SIGNED_BUCKET: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_SIGNED_BUCKET }}
+          S3_SIGNER_FOLDERS: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_SIGNER_FOLDERS }}
+
       - name: Download signed JARs from S3
         run: |
           mkdir -p signed
