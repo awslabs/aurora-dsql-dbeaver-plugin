@@ -60,8 +60,7 @@ jobs:
               JOB_ID=$(aws s3api get-object-tagging --bucket "$S3_UNSIGNED_BUCKET" --key "$S3_SIGNER_FOLDERS/$FILENAME" --version-id "$VERSION_ID" 2>/dev/null | jq -r '.TagSet[] | select(.Key=="signer-job-id") | .Value')
               if [ "$JOB_ID" != "null" ] && [ -n "$JOB_ID" ]; then
                 echo "Job ID for $FILENAME: $JOB_ID"
-                BASENAME="${FILENAME%.jar}"
-                SIGNED_FILENAME="${BASENAME}-${JOB_ID}.jar"
+                SIGNED_FILENAME="${FILENAME}-${JOB_ID}.jar"
                 echo "$SIGNED_FILENAME" >> signed_jars.txt
                 echo "Signed JAR will be: $SIGNED_FILENAME"
                 break
@@ -79,7 +78,22 @@ jobs:
           S3_UNSIGNED_BUCKET: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_UNSIGNED_BUCKET }}
           S3_SIGNER_FOLDERS: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_SIGNER_FOLDERS }}
 
-      - name: Display signed JARs
-        run: cat signed_jars.txt
+     
+      - name: Download signed JARs from S3
+        run: |
+          mkdir -p signed
+          while read -r SIGNED_FILENAME; do
+            echo "Downloading: $SIGNED_FILENAME"
+            aws s3 cp "s3://$S3_SIGNED_BUCKET/$S3_SIGNER_FOLDERS/$SIGNED_FILENAME" "signed/$SIGNED_FILENAME"
+            echo "Downloaded to: signed/$SIGNED_FILENAME"
+          done < signed_jars.txt
+        env:
+          S3_SIGNED_BUCKET: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_SIGNED_BUCKET }}
+          S3_SIGNER_FOLDERS: ${{ secrets.AURORA_DSQL_DBEAVER_PLUGIN_S3_SIGNER_FOLDERS }}
 
 
+      - name: Upload JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: jars
+          path: 'signed/*.jar'
