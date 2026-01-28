@@ -125,8 +125,26 @@ jobs:
           rm -rf update-site/* 
           cp -r software.aws.aurora.dsql.dbeaver.updatesite/target/repository/* update-site/
 
-      - name: Upload Update Site Repository
-        uses: actions/upload-artifact@v4
+      - name: Extract version from uploaded JARs
+        id: get_version
+        run: |
+          FIRST_JAR=$(head -1 uploaded_jars.txt | cut -d'|' -f1)
+          VERSION=$(echo "$FIRST_JAR" | sed 's/.*-\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\.jar/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Plugin version: $VERSION"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
         with:
-          name: update-site-repository
-          path: 'update-site/**'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update site repository with signed JARs v${{ steps.get_version.outputs.version }}
+          branch: update-site-v${{ steps.get_version.outputs.version }}
+          title: 'Release: Update site repository v${{ steps.get_version.outputs.version }}'
+          body: |
+            Automated PR with signed JARs and updated site repository.
+            
+            **Version:** ${{ steps.get_version.outputs.version }}
+            
+            Requires maintainer approval before merge.
+          add-paths: |
+            update-site/**
