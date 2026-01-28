@@ -139,6 +139,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: Update site repository with signed JARs v${{ steps.get_version.outputs.version }}
           branch: update-site-v${{ steps.get_version.outputs.version }}
+          base: main
           title: 'Release: Update site repository v${{ steps.get_version.outputs.version }}'
           body: |
             Automated PR with signed JARs and updated site repository.
