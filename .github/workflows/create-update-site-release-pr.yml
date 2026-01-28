@@ -4,8 +4,6 @@ name: DBeaver Release - Create Update Site Repo PR
 on:
   release:
     types: [created]      # Runs when you create a GitHub release
-  pull_request:
-    branches: [ main ]    # TODO REMOVE Runs when PR is opened/updated targeting main branch
   workflow_dispatch:      # Runs when you manually click "Run workflow" button
 
 permissions:
