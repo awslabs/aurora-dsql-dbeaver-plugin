@@ -18,6 +18,10 @@ import org.jkiss.utils.CommonUtils;
 
 public class DSQLDataSourceProvider extends JDBCDataSourceProvider {
 
+    public DSQLDataSourceProvider() {
+        super(DSQLDataSourceProvider.class);
+    }
+
     @Override
     public long getFeatures() {
         return FEATURE_CATALOGS | FEATURE_SCHEMAS;
