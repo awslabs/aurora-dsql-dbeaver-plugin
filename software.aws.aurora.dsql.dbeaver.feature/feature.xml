@@ -2,7 +2,7 @@
 <feature
       id="feature"
       label="Aurora DSQL Connector for JDBC"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="AWS">
 
    <description>
@@ -194,10 +194,10 @@
 
    <plugin
          id="community-plugin"
-         version="1.0.0.qualifier"/>
+         version="1.0.1.qualifier"/>
 
    <plugin
          id="ui"
-         version="1.0.0.qualifier"/>
+         version="1.0.1.qualifier"/>
 
 </feature>
