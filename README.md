@@ -8,7 +8,7 @@ A DBeaver plugin that enables connectivity to Amazon Aurora DSQL databases with 
 
 ## Overview
 
-This plugin installs and sets up the [Aurora DSQL Connector for JDBC](https://github.com/awslabs/aurora-dsql-jdbc-connector) for DBeaver to connect to Amazon Aurora DSQL.
+This plugin installs and sets up the [Aurora DSQL Connector for JDBC](https://github.com/awslabs/aurora-dsql-connectors/tree/main/java/jdbc) for DBeaver to connect to Amazon Aurora DSQL.
 
 Features:
 - IAM authentication configuration
