@@ -76,15 +76,6 @@ If you see a missing driver icon or connection errors, the Aurora DSQL (Communit
 
 **Solution:** Reinstall the Aurora DSQL (Community plugin) by following the installation steps above.
 
-### SSL/TLS Certificate Error (PKIX)
-
-If you encounter a `PKIX path building failed` error when connecting to Aurora DSQL, your DBeaver installation may not have the required SSL certificates.
-
-**Cause:** DBeaver uses its own bundled Java keystore which may not include all certificates from your system's trust store.
-
-**Solution:** Import the required CA certificates from your local Java installation into DBeaver by following the [DBeaver wiki guide](https://github.com/dbeaver/dbeaver/wiki/Importing-CA-certificates-from-your-local-Java-into-DBeaver).
-
-
 ## Developer 
 
 ### Prerequisites
