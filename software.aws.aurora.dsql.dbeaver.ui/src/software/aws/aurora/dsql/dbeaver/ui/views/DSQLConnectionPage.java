@@ -11,7 +11,6 @@ import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.jkiss.dbeaver.ext.postgresql.PostgreConstants;
@@ -76,7 +75,7 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
         // Initialize auth model selector in a hidden composite
         super.createAuthPanel(hiddenComposite, gridColumns);
 
-        Group myGroup = UIUtils.createControlGroup(
+        Composite myGroup = UIUtils.createTitledComposite(
                 parent,
                 "Authentication",
                 2, // number of columns
@@ -137,7 +136,7 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
         GridData gd = new GridData(GridData.FILL_BOTH);
         mainGroup.setLayoutData(gd);
 
-        Group addrGroup = UIUtils.createControlGroup(
+        Composite addrGroup = UIUtils.createTitledComposite(
                 mainGroup,
                 UIConnectionMessages.dialog_connection_server_label,
                 4,
