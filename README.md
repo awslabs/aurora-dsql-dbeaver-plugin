@@ -16,9 +16,9 @@ Features:
 
 ## Prerequisites
 
-- **DBeaver**: Version 24.3.5 or later 
+- **DBeaver**: Version 26.0.0 or later 
 - **AWS Credentials**: Configured AWS credentials for IAM authentication
-- **Java**: JRE 21 or later (included with DBeaver 24.3.5+)
+- **Java**: JRE 21 or later (included with DBeaver 26.0.0+)
 
 
 ## Windows Installation
