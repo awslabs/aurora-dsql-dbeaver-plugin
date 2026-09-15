@@ -12,6 +12,7 @@ Require-Bundle: community-plugin,
  org.eclipse.core.runtime,
  org.jkiss.dbeaver.model,
  org.jkiss.dbeaver.registry,
+ org.jkiss.dbeaver.ui;bundle-version="5.1.164",
  org.jkiss.dbeaver.ui.editors.connection,
  org.jkiss.dbeaver.ui.navigator,
  org.jkiss.dbeaver.ext.postgresql.ui
