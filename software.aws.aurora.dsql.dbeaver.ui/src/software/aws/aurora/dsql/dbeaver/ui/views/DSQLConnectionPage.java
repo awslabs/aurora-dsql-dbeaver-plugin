@@ -11,8 +11,10 @@ import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.postgresql.PostgreConstants;
 import org.jkiss.dbeaver.ext.postgresql.model.impls.PostgreServerType;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -52,6 +54,34 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
     private Text profileText;
     private Text regionText;
 
+    /**
+     * Creates a standard SWT group without depending on DBeaver's unstable UI group helpers.
+     *
+     * DBeaver 26.1 removed UIUtils.createControlGroup, while its replacement,
+     * UIUtils.createTitledComposite, is unavailable in DBeaver 24.3.5.
+     */
+    private static Group createControlGroup(
+            Composite parent,
+            String label,
+            int columns,
+            int layoutStyle,
+            int widthHint
+    ) {
+        Group group = new Group(parent, SWT.NONE);
+        group.setText(label);
+
+        if (parent.getLayout() instanceof GridLayout) {
+            GridData gridData = new GridData(layoutStyle);
+            if (widthHint > 0) {
+                gridData.widthHint = widthHint;
+            }
+            group.setLayoutData(gridData);
+        }
+
+        group.setLayout(new GridLayout(columns, false));
+        return group;
+    }
+
     @Override
     public void dispose() {
         if (dsqlImage != null && !dsqlImage.isDisposed()) {
@@ -75,7 +105,7 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
         // Initialize auth model selector in a hidden composite
         super.createAuthPanel(hiddenComposite, gridColumns);
 
-        Composite myGroup = UIUtils.createTitledComposite(
+        Composite myGroup = createControlGroup(
                 parent,
                 "Authentication",
                 2, // number of columns
@@ -136,7 +166,7 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
         GridData gd = new GridData(GridData.FILL_BOTH);
         mainGroup.setLayoutData(gd);
 
-        Composite addrGroup = UIUtils.createTitledComposite(
+        Composite addrGroup = createControlGroup(
                 mainGroup,
                 UIConnectionMessages.dialog_connection_server_label,
                 4,
@@ -349,7 +379,12 @@ public class DSQLConnectionPage extends ConnectionPageWithAuth implements IDialo
             if (driver == null) {
                 return;
             }
-            urlText.setText(driver.getConnectionURL(config));
+            try {
+                urlText.setText(driver.getConnectionURL(config));
+                setErrorMessage(null);
+            } catch (DBException e) {
+                setErrorMessage(e.getMessage());
+            }
         }
     }
 }

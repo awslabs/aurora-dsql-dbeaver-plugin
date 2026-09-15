@@ -9,7 +9,7 @@ Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Require-Bundle:  
  org.eclipse.core.runtime,
- org.jkiss.dbeaver.model,
+ org.jkiss.dbeaver.model;bundle-version="2.0.9",
  org.jkiss.dbeaver.ext.postgresql,
  org.jkiss.dbeaver.ext.postgresql.ui
 Export-Package: software.aws.aurora.dsql.dbeaver
